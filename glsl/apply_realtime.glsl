@@ -43,7 +43,7 @@ vec3 correctFilter(vec3 hsl){
 
 	//Saturation
 	prev = vec2(0.0,0.0);
-	cur = vec2(0.4,0.6);
+	cur = vec2(0.5,0.7);
 	if (hsl.y > cur.x){
 		prev=cur;
 		cur=vec2(1.0,1.0);
@@ -59,10 +59,8 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
 	vec2 xy = fragCoord.xy / iResolution.xy;
 	vec4 texColor = texture(iChannel0,xy);
-	if (xy.y > 0.5){
-		vec3 hsl = rgb2hsv(vec3(texColor.r,texColor.g,texColor.b));
-		hsl=correctFilter(hsl);
-		texColor.rgb = hsv2rgb(hsl);
-	}
+	vec3 hsl = rgb2hsv(vec3(texColor.r,texColor.g,texColor.b));
+	hsl=correctFilter(hsl);
+	texColor.rgb = hsv2rgb(hsl);
 	fragColor = texColor;
 }
