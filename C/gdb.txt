@@ -1,0 +1,45 @@
+Reading symbols from a.out...(no debugging symbols found)...done.
+Starting program: /home/rob/go/gopath/src/github.com/empijei/gotrials/colorfix/C/a.out 
+
+Program received signal SIGSEGV, Segmentation fault.
+0x00007ffff7ac22e9 in XGetWindowAttributes () from /usr/lib/libX11.so.6
+quit
+Reading symbols from a.out...(no debugging symbols found)...done.
+Quit
+quit
+Reading symbols from a.out...done.
+Breakpoint 1 at 0xcf5: file main.c, line 64.
+Starting program: /home/rob/go/gopath/src/github.com/empijei/gotrials/colorfix/C/a.out 
+
+Breakpoint 1, capture () at main.c:64
+64		printf("%d %d", width,height);
+0x0000555555554cfb	64		printf("%d %d", width,height);
+0x0000555555554d01	64		printf("%d %d", width,height);
+65		XMapWindow(disp,w);
+66		XImage *ximg = XGetImage(disp, w, 0, 0, width, height, AllPlanes, ZPixmap);
+quit
+Reading symbols from a.out...done.
+Starting program: /home/rob/go/gopath/src/github.com/empijei/gotrials/colorfix/C/a.out 
+[Inferior 1 (process 30154) exited with code 01]
+quit
+Reading symbols from a.out...done.
+Breakpoint 1 at 0xd15: file main.c, line 58.
+Starting program: /home/rob/go/gopath/src/github.com/empijei/gotrials/colorfix/C/a.out 
+
+Breakpoint 1, capture () at main.c:58
+58		screenshot *img = (screenshot *) malloc(sizeof(screenshot));
+$1 = {x = -1, y = -1, width = 1, height = 1, border_width = 0, depth = 0, visual = 0x555555762dd8, 
+  root = 330, class = 2, bit_gravity = 0, win_gravity = 1, backing_store = 0, 
+  backing_planes = 4294967295, backing_pixel = 0, save_under = 0, colormap = 0, map_installed = 0, 
+  map_state = 2, all_event_masks = 4718592, your_event_mask = 0, do_not_propagate_mask = 0, 
+  override_redirect = 0, screen = 0x555555759230}
+quit
+Reading symbols from a.out...done.
+Starting program: /home/rob/go/gopath/src/github.com/empijei/gotrials/colorfix/C/a.out 
+[Inferior 1 (process 30956) exited with code 01]
+quit
+Reading symbols from a.out...done.
+Quit
+quit
+Reading symbols from a.out...done.
+quit
