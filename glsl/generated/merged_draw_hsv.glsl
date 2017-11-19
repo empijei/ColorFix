@@ -19,11 +19,18 @@ vec3 hsv2rgb(vec3 c)
 vec3 correctFilter(vec3 hsl){
 	//Hue
 	vec2 prev, cur;
-	prev=vec2(0.67,0.7611);
-	cur=vec2(1.0,1.0);
+	prev=vec2(1.0,1.0);
+    if (hsl.x < prev.x){
+		cur=prev;
+		prev=vec2(0.8,0.8);
+	}
+    if (hsl.x < prev.x){
+		cur=prev;
+		prev=vec2(0.67,0.73);
+	}
 	if (hsl.x < prev.x){
 		cur=prev;
-		prev=vec2(0.3639,0.3639);
+		prev=vec2(0.36,0.34);
 	}
 	if (hsl.x < prev.x){
 		cur=prev;
@@ -58,16 +65,5 @@ vec3 correctFilter(vec3 hsl){
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
 	vec2 xy = fragCoord.xy / iResolution.xy;
-	vec4 texColor;
-	if (xy.y < 0.5){
-		texColor.rgb = hsv2rgb(vec3(xy.x,xy.y*2.0,1.0));
-	}else{
-		//Show filtered image below
-		texColor.rgb = hsv2rgb(vec3(xy.x,(xy.y-0.5)*2.0,1.0));
-		vec3 hsl = rgb2hsv(vec3(texColor.r,texColor.g,texColor.b));
-		hsl=correctFilter(hsl);
-		texColor.rgb = hsv2rgb(hsl);
-	}
-	//Set the screen pixel to that color
-	fragColor = texColor;
+	fragColor.xyz = hsv2rgb(vec3(xy.x,xy.y,1.0));
 }

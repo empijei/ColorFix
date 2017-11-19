@@ -16,8 +16,3 @@ vec3 hsv2rgb(vec3 c)
 	return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
-void mainImage( out vec4 fragColor, in vec2 fragCoord )
-{
-	vec2 xy = fragCoord.xy / iResolution.xy;
-	fragColor.xyz = hsv2rgb(vec3(xy.x,xy.y,1.0));
-}
