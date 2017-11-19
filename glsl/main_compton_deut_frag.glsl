@@ -1,3 +1,5 @@
+uniform sampler2D tex;
+
 //Run with compton --backend glx --force-win-blend --glx-fshader-win "$(cat compton_deut.frag)"
 void main()
 {

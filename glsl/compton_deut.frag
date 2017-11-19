@@ -1,3 +1,6 @@
+//Run with compton --backend glx --force-win-blend --glx-fshader-win "$(cat compton_deut.frag)"
+uniform sampler2D tex;
+
 vec3 rgb2hsv(vec3 c)
 {
 	vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
@@ -19,18 +22,11 @@ vec3 hsv2rgb(vec3 c)
 vec3 correctFilter(vec3 hsl){
 	//Hue
 	vec2 prev, cur;
-	prev=vec2(1.0,1.0);
-    if (hsl.x < prev.x){
-		cur=prev;
-		prev=vec2(0.8,0.8);
-	}
-    if (hsl.x < prev.x){
-		cur=prev;
-		prev=vec2(0.67,0.73);
-	}
+	prev=vec2(0.67,0.7611);
+	cur=vec2(1.0,1.0);
 	if (hsl.x < prev.x){
 		cur=prev;
-		prev=vec2(0.36,0.34);
+		prev=vec2(0.3639,0.3639);
 	}
 	if (hsl.x < prev.x){
 		cur=prev;
@@ -38,7 +34,7 @@ vec3 correctFilter(vec3 hsl){
 	}
 	if (hsl.x < prev.x){
 		cur=prev;
-		prev=vec2(0.1333,0.0369);
+		prev=vec2(0.1,0.04);
 	}
 	if (hsl.x < prev.x){
 		cur=prev;
@@ -50,10 +46,10 @@ vec3 correctFilter(vec3 hsl){
 
 	//Saturation
 	prev = vec2(0.0,0.0);
-	cur = vec2(0.2,0.4);
+	cur = vec2(0.5,0.7);
 	if (hsl.y > cur.x){
 		prev=cur;
-		cur=vec2(1.0,0.99);
+		cur=vec2(1.0,1.0);
 	}
 
 	coeff = (hsl.y - prev.x) / (cur.x - prev.x);
@@ -62,9 +58,6 @@ vec3 correctFilter(vec3 hsl){
 	return hsl;
 }
 
-uniform sampler2D tex;
-
-//Run with compton --backend glx --force-win-blend --glx-fshader-win "$(cat compton_deut.frag)"
 void main()
 {
 	vec4 texColor = texture2D(tex, gl_TexCoord[0].st);
