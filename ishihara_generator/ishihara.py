@@ -88,9 +88,7 @@ def circle_draw(draw_image, image, (x, y, r)):
 
     rgbColor = color(int(fill_color.split(":")[0],16))
     variation = float(fill_color.split(":")[1])
-    print rgbColor
     randomizedColor = randomize(rgbColor,variation)
-    print randomizedColor
     draw_image.ellipse((x - r, y - r, x + r, y + r),
                        fill=randomizedColor,
                        outline=randomizedColor)
@@ -98,18 +96,15 @@ def circle_draw(draw_image, image, (x, y, r)):
 def parseBkgColors(backgroundColors):
     global COLORS_OFF
     COLORS_OFF = backgroundColors
-    print "COLORS_OFF " + repr(COLORS_OFF)
 
 def parsePttColors(patternColors):
     global COLORS_ON
     COLORS_ON = patternColors
-    print "COLORS_ON " + repr(COLORS_ON)
 
 def parsePattern(pattern):
     global TEXT
     if pattern is not None:
         TEXT = pattern
-    print "TEXT " + repr(TEXT)
 
 
 def parseParam():
@@ -160,7 +155,7 @@ def main():
                     tries += 1
                     circle = generate_circle(width, height, min_diameter, max_diameter)
 
-            print '{}/{} {}'.format(i, TOTAL_CIRCLES, tries)
+            print 'Circle {} of {} : necessary tries {}'.format(i, TOTAL_CIRCLES, tries)
 
             circles.append(circle)
             circle_draw(draw_image, image, circle)
