@@ -2,8 +2,11 @@ import math
 import random
 import sys
 import argparse
-import colorsys
+import copy
 from PIL import Image, ImageDraw, ImageFont
+from colormath.color_objects import LabColor, sRGBColor
+from colormath.color_conversions import convert_color
+from colormath.color_diff import delta_e_cie2000
 
 try:
     from scipy.spatial import cKDTree as KDTree
@@ -25,7 +28,7 @@ COLORS_OFF = [
     color(0xede05a)
 ]
 
-def createImage(text,size=500,fontSize=200):
+def createImage(text,size=700,fontSize=250):
     width = size
     height = width
     txt = Image.new('RGB', (width, height), (255,255,255))
@@ -61,22 +64,33 @@ def overlaps_motive(image, (x, y, r)):
 def circle_intersection((x1, y1, r1), (x2, y2, r2)):
     return (x2 - x1)**2 + (y2 - y1)**2 < (r2 + r1)**2
 
-def randomize
+def randomize(rgb,labDistance):
+    rgbColor = sRGBColor(rgb[0]/255.0, rgb[1]/255.0, rgb[2]/255.0)
+    randomDistance = random.random()*(labDistance*2) - labDistance
+
+    labColor = convert_color(rgbColor,LabColor)
+    labColor2 = copy.deepcopy(labColor)
+    signum = (random.choice([-1.0,1.0]),random.choice([-1.0,1.0]),random.choice([-1.0,1.0]))
+    while(delta_e_cie2000(labColor,labColor2)< randomDistance):
+        current = random.randint(0,2)
+        if current == 0:
+            labColor2.lab_l = labColor2.lab_l + signum[current]*labColor2.lab_l/100.0*5.0
+        elif current == 2:
+            labColor2.lab_a = labColor2.lab_a + signum[current]*labColor2.lab_a/100.0*5.0
+        elif current == 2:
+            labColor2.lab_b = labColor2.lab_b + signum[current]*labColor2.lab_b/100.0*5.0
+    rgbModified = convert_color(labColor2,sRGBColor)
+    return tuple(map(int,[rgbModified.rgb_r*255,rgbModified.rgb_g*255,rgbModified.rgb_b*255]))
 
 def circle_draw(draw_image, image, (x, y, r)):
     fill_colors = COLORS_ON if overlaps_motive(image, (x, y, r)) else COLORS_OFF
     fill_color = random.choice(fill_colors)
 
     rgbColor = color(int(fill_color.split(":")[0],16))
-    variation = int(fill_color.split(":")[1],10)
-
-    hlsColor = rgb_to_hls(rgbColor[0]/255.0,rgbColor[1]/255.0,rgbColor[2]/255.0)
-
-    #generate each RGB component from X-(RANDMAX) to X+(RANDMAX)
-    randomize = lambda x : int((x + (random.random()*(variation*2)) - variation)) & 255
-
-    randomizedColor = tuple(map(,rgbColor))
-
+    variation = float(fill_color.split(":")[1])
+    print rgbColor
+    randomizedColor = randomize(rgbColor,variation)
+    print randomizedColor
     draw_image.ellipse((x - r, y - r, x + r, y + r),
                        fill=randomizedColor,
                        outline=randomizedColor)
