@@ -2,8 +2,8 @@ import math
 import random
 import sys
 import argparse
-
-from PIL import Image, ImageDraw
+import colorsys
+from PIL import Image, ImageDraw, ImageFont
 
 try:
     from scipy.spatial import cKDTree as KDTree
@@ -11,10 +11,9 @@ try:
     IMPORTED_SCIPY = True
 except ImportError:
     IMPORTED_SCIPY = False
-
+TEXT = "TEST"
 BACKGROUND = (255, 255, 255) #COLOR TO IDENTIFY BACKGROUND IN GIVE IMAGE FOR PATTERN
 TOTAL_CIRCLES = 1500
-PATTERNPATH = None
 color = lambda c: ((c >> 16) & 255, (c >> 8) & 255, c & 255) #HEX TO RGB
 
 #COLORS OF THE PATTERN
@@ -26,6 +25,15 @@ COLORS_OFF = [
     color(0xede05a)
 ]
 
+def createImage(text,size=500,fontSize=200):
+    width = size
+    height = width
+    txt = Image.new('RGB', (width, height), (255,255,255))
+    font = ImageFont.truetype("./Sansus Webissimo-Regular.ttf", fontSize)
+    txtContext = ImageDraw.Draw(txt)
+    textSize = txtContext.textsize(text,font)
+    txtContext.text(((width-textSize[0])/2,(height-textSize[1])/2),text,font=font,fill="black")
+    return txt
 
 def generate_circle(image_width, image_height, min_diameter, max_diameter):
     radius = random.triangular(min_diameter, max_diameter,
@@ -53,6 +61,7 @@ def overlaps_motive(image, (x, y, r)):
 def circle_intersection((x1, y1, r1), (x2, y2, r2)):
     return (x2 - x1)**2 + (y2 - y1)**2 < (r2 + r1)**2
 
+def randomize
 
 def circle_draw(draw_image, image, (x, y, r)):
     fill_colors = COLORS_ON if overlaps_motive(image, (x, y, r)) else COLORS_OFF
@@ -60,8 +69,12 @@ def circle_draw(draw_image, image, (x, y, r)):
 
     rgbColor = color(int(fill_color.split(":")[0],16))
     variation = int(fill_color.split(":")[1],10)
+
+    hlsColor = rgb_to_hls(rgbColor[0],rgbColor[1],rgbColor[2])
     #generate each RGB component from X-(RANDMAX) to X+(RANDMAX)
-    randomizedColor = tuple(map(lambda x : int((x + (random.random()*(variation*2)) - variation)) & 255,rgbColor))
+    randomize = lambda x : int((x + (random.random()*(variation*2)) - variation)) & 255
+
+    randomizedColor = tuple(map(,rgbColor))
 
     draw_image.ellipse((x - r, y - r, x + r, y + r),
                        fill=randomizedColor,
@@ -77,10 +90,11 @@ def parsePttColors(patternColors):
     COLORS_ON = patternColors
     print "COLORS_ON " + repr(COLORS_ON)
 
-def parsePatternPath(patternPath):
-    global PATTERNPATH
-    PATTERNPATH = patternPath
-    print "PATTERNPATH " + repr(PATTERNPATH)
+def parsePattern(pattern):
+    global TEXT
+    if pattern is not None:
+        TEXT = pattern
+    print "TEXT " + repr(TEXT)
 
 
 def parseParam():
@@ -90,15 +104,15 @@ def parseParam():
                         help='Background color/s. Format HEX:VARIATION, where HEX is the color and VARIATION is an intenger to be the MAX variation of each RGB component')
     parser.add_argument('-pttc', type=str, action='append', required=True,
                         help='Pattern color/s. Format HEX:VARIATION, where HEX is the color and VARIATION is an intenger to be the MAX variation of each RGB component')
-    parser.add_argument('--pattern', type=str, required=True, help='Path of the pattern image')
+    parser.add_argument('--pattern', type=str, help='Text to display')
     args = vars(parser.parse_args())
     parseBkgColors(args["bkgc"])
     parsePttColors(args["pttc"])
-    parsePatternPath(args["pattern"])
+    parsePattern(args["pattern"])
 
 def main():
     parseParam()
-    image = Image.open(PATTERNPATH)
+    image = createImage(TEXT)
     image2 = Image.new('RGB', image.size, BACKGROUND)
     draw_image = ImageDraw.Draw(image2)
 
