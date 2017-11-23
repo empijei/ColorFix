@@ -70,7 +70,8 @@ def circle_draw(draw_image, image, (x, y, r)):
     rgbColor = color(int(fill_color.split(":")[0],16))
     variation = int(fill_color.split(":")[1],10)
 
-    hlsColor = rgb_to_hls(rgbColor[0],rgbColor[1],rgbColor[2])
+    hlsColor = rgb_to_hls(rgbColor[0]/255.0,rgbColor[1]/255.0,rgbColor[2]/255.0)
+
     #generate each RGB component from X-(RANDMAX) to X+(RANDMAX)
     randomize = lambda x : int((x + (random.random()*(variation*2)) - variation)) & 255
 
