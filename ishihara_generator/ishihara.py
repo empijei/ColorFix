@@ -2,6 +2,7 @@ import math
 import random
 import sys
 import argparse
+import sys
 import copy
 from PIL import Image, ImageDraw, ImageFont
 from colormath.color_objects import LabColor, sRGBColor
@@ -16,9 +17,10 @@ except ImportError:
     IMPORTED_SCIPY = False
 TEXT = "TEST"
 BACKGROUND = (255, 255, 255) #COLOR TO IDENTIFY BACKGROUND IN GIVE IMAGE FOR PATTERN
-TOTAL_CIRCLES = 1500
+TOTAL_CIRCLES = 1250
 color = lambda c: ((c >> 16) & 255, (c >> 8) & 255, c & 255) #HEX TO RGB
-
+FILENAME = ""
+DEBUG = False
 #COLORS OF THE PATTERN
 COLORS_ON = [
     color(0xd7ed5a)
@@ -28,7 +30,7 @@ COLORS_OFF = [
     color(0xede05a)
 ]
 
-def createImage(text,size=700,fontSize=250):
+def createImage(text,size=500,fontSize=300):
     width = size
     height = width
     txt = Image.new('RGB', (width, height), (255,255,255))
@@ -106,6 +108,11 @@ def parsePattern(pattern):
     if pattern is not None:
         TEXT = pattern
 
+def parseFile(filename):
+    global FILENAME
+    if filename is not None:
+        FILENAME = filename
+
 
 def parseParam():
     parser = argparse.ArgumentParser(description='Generate Ishihara plate given colors and a pattern')
@@ -115,10 +122,16 @@ def parseParam():
     parser.add_argument('-pttc', type=str, action='append', required=True,
                         help='Pattern color/s. Format HEX:VARIATION, where HEX is the color and VARIATION is an intenger to be the MAX variation of each RGB component')
     parser.add_argument('--pattern', type=str, help='Text to display')
+    parser.add_argument('--file', type=str, help='File to save the image to')
+    parser.add_argument('-dbg', action='store_true', help='Print debug info')
     args = vars(parser.parse_args())
     parseBkgColors(args["bkgc"])
     parsePttColors(args["pttc"])
     parsePattern(args["pattern"])
+    parseFile(args["file"])
+    if args["dbg"]:
+        global DEBUG
+        DEBUG = True
 
 def main():
     parseParam()
@@ -154,15 +167,18 @@ def main():
                 while any(circle_intersection(circle, circle2) for circle2 in circles):
                     tries += 1
                     circle = generate_circle(width, height, min_diameter, max_diameter)
-
-            print 'Circle {} of {} : necessary tries {}'.format(i, TOTAL_CIRCLES, tries)
+            if DEBUG:
+                print('Circle {} of {} : necessary tries {}                                 '.format(i, TOTAL_CIRCLES, tries))
 
             circles.append(circle)
             circle_draw(draw_image, image, circle)
     except (KeyboardInterrupt, SystemExit):
         pass
-
-    image2.show()
+    if FILENAME == "":
+        image2.show()
+    else:
+        image2.save(FILENAME,"png")
+    print("")
 
 if __name__ == '__main__':
     main()
