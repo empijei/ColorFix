@@ -17,7 +17,8 @@ except ImportError:
     IMPORTED_SCIPY = False
 TEXT = "TEST"
 BACKGROUND = (255, 255, 255) #COLOR TO IDENTIFY BACKGROUND IN GIVE IMAGE FOR PATTERN
-TOTAL_CIRCLES = 1250
+IMAGEBACKGROUND = (0x30,0x30,0x30)
+TOTAL_CIRCLES = 550
 color = lambda c: ((c >> 16) & 255, (c >> 8) & 255, c & 255) #HEX TO RGB
 FILENAME = ""
 DEBUG = False
@@ -30,7 +31,7 @@ COLORS_OFF = [
     color(0xede05a)
 ]
 
-def createImage(text,size=500,fontSize=300):
+def createImage(text,size=500,fontSize=450):
     width = size
     height = width
     txt = Image.new('RGB', (width, height), (255,255,255))
@@ -122,6 +123,7 @@ def parseParam():
     parser.add_argument('-pttc', type=str, action='append', required=True,
                         help='Pattern color/s. Format HEX:VARIATION, where HEX is the color and VARIATION is an intenger to be the MAX variation of each RGB component')
     parser.add_argument('--pattern', type=str, help='Text to display')
+    parser.add_argument('--background', type=str, help='Background of the generated image')
     parser.add_argument('--file', type=str, help='File to save the image to')
     parser.add_argument('-dbg', action='store_true', help='Print debug info')
     args = vars(parser.parse_args())
@@ -132,17 +134,20 @@ def parseParam():
     if args["dbg"]:
         global DEBUG
         DEBUG = True
+    if args["background"]:
+        global IMAGEBACKGROUND
+        IMAGEBACKGROUND = color(int(args["background"],16))
 
 def main():
     parseParam()
     image = createImage(TEXT)
-    image2 = Image.new('RGB', image.size, BACKGROUND)
+    image2 = Image.new('RGB', image.size, IMAGEBACKGROUND)
     draw_image = ImageDraw.Draw(image2)
 
     width, height = image.size
 
-    min_diameter = (width + height) / 200
-    max_diameter = (width + height) / 75
+    min_diameter = (width + height) / 120
+    max_diameter = (width + height) / 50
 
     circle = generate_circle(width, height, min_diameter, max_diameter)
     circles = [circle]

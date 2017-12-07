@@ -3,20 +3,19 @@ import copy
 import os
 import random
 from math import sqrt
-from colormath.color_objects import LabColor, sRGBColor
+from colormath.color_objects import LabColor, sRGBColor, HSVColor
 from colormath.color_conversions import convert_color
 from colormath.color_diff import delta_e_cie2000
 
 
 
 color = lambda c: ((c >> 16) & 255, (c >> 8) & 255, c & 255) #HEX TO RGB
-getLightOld = lambda x : x[0] * 0.2126 + x[1] * 0.7152 + x[2] * 0.0722
+getLightLinear = lambda x : x[0] * 0.2126 + x[1] * 0.7152 + x[2] * 0.0722
 getLight255 = lambda x : x[0]*x[0] * 0.241 + x[1]*x[1] * 0.691 + x[2]*x[2] * 0.068
 getLight1 = lambda x : getLight255(RGBto255(x))
 RGBto255 = lambda x : (x[0] * 255, x[1] * 255, x[2] * 255)
 RGBto1 =lambda x : (x[0] / 255.0, x[1] / 255.0, x[2] / 255.0)
 RGBtoLightUpscale = lambda x,k : (x[0] *sqrt(k), x[1] *sqrt(k), x[2] *sqrt(k))
-RGBtoLightUpscaleBOH = lambda x,k : (x[0] *k, x[1] *k, x[2] *k)
 
 def sComponentToLinear(component):
     if(component<=0.04045):
@@ -65,31 +64,50 @@ def normalizedToLow1(colorLeft,colorRight):
 
 def checkYellow():
     print "Testing yellow:"
-    yellow = sRGBColor(245/255.0, 245/255.0, 00/255.0)
-    colorRight = copy.deepcopy(yellow)
-    colorLeft = copy.deepcopy(yellow)
-    for i in range(1,8):
-        colorLeft.rgb_r -= 8.5/255.0
-        colorRight.rgb_g -= 8.5/255.0
+    yellow = sRGBColor(255/255.0, 255/255.0, 00/255.0)
+
+    yellow = HSVColor(60.0, 1, 1)
+
+    colorRightHSV = copy.deepcopy(yellow)
+    colorLeftHSV = copy.deepcopy(yellow)
+    i = 0
+    k = 0.5
+    while True:
+        if (yellow.hsv_h + i*k > 360) or (yellow.hsv_h + i*k < 0):
+            break
+        colorLeftHSV.hsv_h = yellow.hsv_h - i*k
+        colorRightHSV.hsv_h = yellow.hsv_h + i*k
+
+        colorLeft = convert_color(colorLeftHSV, sRGBColor)
+        colorRight = convert_color(colorRightHSV, sRGBColor)
+
         normalizedLeft,normalizedRight = normalizedToLow1(colorLeft,colorRight)
+        background = sRGBColor(1,1,1)
+        background, _ = normalizedToLow1(background,normalizedLeft)
+
         left = sRGBColor.get_rgb_hex(normalizedLeft)
         right = sRGBColor.get_rgb_hex(normalizedRight)
         left = "0x"+left[1:]
         right = "0x"+right[1:]
+        back = sRGBColor.get_rgb_hex(background)
+        back = "0x"+back[1:]
         number = random.choice(range(10))
         command = "python ishihara.py -bkgc {}:0 -pttc {}:0 --pattern {} ".format(left,right,number)
         os.system(command)
         print "Which number (0-9 or none): "
         choice = raw_input()
-
+        i += 1
         try:
             if number == int(choice,10):
                 print "Correct, edge : {} {}".format(left,right)
+                print "H left {}, H right {}".format(colorLeftHSV.hsv_h,colorRightHSV.hsv_h)
                 return
             else:
                 continue
         except:
             continue
+
+
     print "No hope for you!"
 
 

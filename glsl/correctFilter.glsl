@@ -16,11 +16,11 @@ vec3 correctFilter(vec3 hsl){
 	}
 	if (hsl.x < prev.x){
 		cur=prev;
-		prev=vec2(0.2,0.3333);
+		prev=vec2(0.2,0.245);
 	}
 	if (hsl.x < prev.x){
 		cur=prev;
-		prev=vec2(0.1333,0.0369);
+		prev=vec2(0.1333,0.103);
 	}
 	if (hsl.x < prev.x){
 		cur=prev;
@@ -43,4 +43,3 @@ vec3 correctFilter(vec3 hsl){
 
 	return hsl;
 }
-
