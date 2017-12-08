@@ -58,6 +58,7 @@ function nextStep(){
 	[bgcolor,fgcolor]=iterateColors();
 	bgcolor = toHex(bgcolor);
 	fgcolor = toHex(fgcolor);
+	console.log(bgcolor,fgcolor);
 	for (var i=0;i<pattern.length;i++){
 		var dot = pattern[i];
 		var c = pickColor(dot[0],dot[1],hctx);

@@ -1,6 +1,7 @@
-function toHex(rgb){
-	console.log(rgb);
-	[r,g,b]=rgb;
+function toHex([r,g,b]){
+	r|=0;
+	g|=0;
+	b|=0;
 	var toCoupleHex = function(x){
 		if (x.length <2){
 			x = "0"+x
@@ -22,7 +23,23 @@ function setupChecker(hue, step){
 	};
 }
 
+
 function normalize(startrgb,derivedrgb){
+	console.log(startrgb,derivedrgb)
+	getLight255 = function ([r,g,b]){
+		return r*r * 0.241 + g*g * 0.691 + b*b * 0.068;
+	}
+	adapt = function([r,g,b],k){
+		return [r *Math.sqrt(k), g *Math.sqrt(k), b *Math.sqrt(k)];
+	}
+	var sl =  getLight255(startrgb);
+	var dl = getLight255(derivedrgb);
+	if (sl>dl){
+		startrgb = adapt(startrgb,dl/sl);
+	}else{
+		derivedrgb = adapt(derivedrgb,sl/dl);
+	}
+	console.log(startrgb,derivedrgb)
 	return [startrgb,derivedrgb];
 }
 
@@ -40,5 +57,6 @@ function iterateColors(){
 	var lr = normalize(startrgb, derivedrgb);
 	colorChecker.iteration++;
 	console.log("startrgb:" + startrgb + ",\n derivedhue:"+derivedhue+",\n derivedrgb:" + derivedrgb);
+	console.log(lr);
 	return lr;
 }
