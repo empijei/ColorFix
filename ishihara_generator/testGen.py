@@ -64,10 +64,7 @@ def normalizedToLow1(colorLeft,colorRight):
 
 def checkYellow():
     print "Testing yellow:"
-    yellow = sRGBColor(255/255.0, 255/255.0, 00/255.0)
-
     yellow = HSVColor(60.0, 1, 1)
-
     colorRightHSV = copy.deepcopy(yellow)
     colorLeftHSV = copy.deepcopy(yellow)
     i = 0
@@ -106,8 +103,49 @@ def checkYellow():
                 continue
         except:
             continue
+    print "No hope for you!"
 
+def checkColor(hue,step):
+    print "Testing hue {}:".format(hue)
+    startColor = HSVColor(hue, 1, 1)
+    colorRightHSV = copy.deepcopy(startColor)
+    colorLeftHSV = copy.deepcopy(startColor)
+    i = 0
+    k = step
+    while True:
+        if (startColor.hsv_h + i*k > 360) or (startColor.hsv_h + i*k < 0):
+            break
+        #colorLeftHSV.hsv_h = startColor.hsv_h - i*k
+        colorRightHSV.hsv_h = startColor.hsv_h + i*k
 
+        colorLeft = convert_color(colorLeftHSV, sRGBColor)
+        colorRight = convert_color(colorRightHSV, sRGBColor)
+
+        normalizedLeft,normalizedRight = normalizedToLow1(colorLeft,colorRight)
+        background = sRGBColor(1,1,1)
+        background, _ = normalizedToLow1(background,normalizedLeft)
+
+        left = sRGBColor.get_rgb_hex(normalizedLeft)
+        right = sRGBColor.get_rgb_hex(normalizedRight)
+        left = "0x"+left[1:]
+        right = "0x"+right[1:]
+        back = sRGBColor.get_rgb_hex(background)
+        back = "0x"+back[1:]
+        number = random.choice(range(10))
+        command = "python ishihara.py -bkgc {}:0 -pttc {}:0 --pattern {} ".format(left,right,number)
+        os.system(command)
+        print "Which number (0-9 or none): "
+        choice = raw_input()
+        i += 1
+        try:
+            if number == int(choice,10):
+                print "Correct, edge : {} {}".format(left,right)
+                print "H left {}, H right {}".format(colorLeftHSV.hsv_h,colorRightHSV.hsv_h)
+                return
+            else:
+                continue
+        except:
+            continue
     print "No hope for you!"
 
 
@@ -182,7 +220,8 @@ def checkYellow2():
 
 
 def main():
-    checkYellow()
+    # checkYellow()
+    checkColor(60.0,-5.0)
 
 if __name__ == '__main__':
     main()
