@@ -20,13 +20,15 @@
 			/**/
 var canvas = document.getElementById("hiddenCanvas");
 var hctx = canvas.getContext("2d");
+var curNumber;
 function changeNumber(){
 	hctx.rect(0, 0, 500, 500)
 	hctx.fillStyle = "#000000";
 	hctx.fill();
 	hctx.fillStyle = "#ffffff";
 	hctx.font = "500px Verdana";
-	hctx.fillText(Math.random()*10|0,105,420);
+	curNumber = Math.random()*10|0;
+	hctx.fillText(curNumber,105,420);
 }
 
 function pickColor(x, y, context){
@@ -73,9 +75,29 @@ function nextStep(){
 setupChecker(60,5);
 nextStep();
 
+function guess(event){
+	//todo
+	if (event.target.innerText == curNumber){
+		var res = getResult();
+		var pointForShader = res/360;
+		alert("Success! Your result is: "+res + "\nPoint for shader: "+pointForShader);
+	}
+	nextStep();
+}
+
 </script>
 
-<button type="button" onclick="nextStep()">Click Me!</button>
-
+<br>
+<button type="button" onclick="guess(event)">1</button>
+<button type="button" onclick="guess(event)">2</button>
+<button type="button" onclick="guess(event)">3</button><br>
+<button type="button" onclick="guess(event)">4</button>
+<button type="button" onclick="guess(event)">5</button>
+<button type="button" onclick="guess(event)">6</button><br>
+<button type="button" onclick="guess(event)">7</button>
+<button type="button" onclick="guess(event)">8</button>
+<button type="button" onclick="guess(event)">9</button><br>
+<button type="button" onclick="guess(event)">0</button>
+<button type="button" onclick="guess(event)">Nothing/Unsure</button>
 </body>
 </html>

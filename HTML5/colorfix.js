@@ -19,7 +19,7 @@ function setupChecker(hue, step){
 	colorChecker = {
 		hue:hue,
 		step:step,
-		iteration:1,
+		iteration:0,
 	};
 }
 
@@ -44,6 +44,7 @@ function normalize(startrgb,derivedrgb){
 }
 
 function iterateColors(){
+	colorChecker.iteration++;
 	var startrgb = hsv2rgb([colorChecker.hue,100,100]);
 	var derivedhue = colorChecker.hue+
 		colorChecker.step*colorChecker.iteration;
@@ -55,8 +56,11 @@ function iterateColors(){
 	}
 	derivedrgb = hsv2rgb([derivedhue,100,100]);
 	var lr = normalize(startrgb, derivedrgb);
-	colorChecker.iteration++;
 	console.log("startrgb:" + startrgb + ",\n derivedhue:"+derivedhue+",\n derivedrgb:" + derivedrgb);
 	console.log(lr);
 	return lr;
+}
+
+function getResult(){
+	return colorChecker.iteration*colorChecker.step+colorChecker.hue;
 }
