@@ -16,6 +16,21 @@
 			Your browser does not support the canvas element.
 		</canvas>
 
+		<textarea id="logger" rows="38" cols="100">Loading test, please wait...</textarea>
+
+		<br>
+		<button type="button" onclick="guess(event)">1</button>
+		<button type="button" onclick="guess(event)">2</button>
+		<button type="button" onclick="guess(event)">3</button><br>
+		<button type="button" onclick="guess(event)">4</button>
+		<button type="button" onclick="guess(event)">5</button>
+		<button type="button" onclick="guess(event)">6</button><br>
+		<button type="button" onclick="guess(event)">7</button>
+		<button type="button" onclick="guess(event)">8</button>
+		<button type="button" onclick="guess(event)">9</button><br>
+		<button type="button" onclick="guess(event)">0</button>
+		<button type="button" onclick="guess(event)">Nothing/Unsure</button>
+
 		<script>
 			/**/
 var canvas = document.getElementById("hiddenCanvas");
@@ -60,7 +75,6 @@ function nextStep(){
 	[bgcolor,fgcolor]=iterateColors();
 	bgcolor = toHex(bgcolor);
 	fgcolor = toHex(fgcolor);
-	console.log(bgcolor,fgcolor);
 	for (var i=0;i<pattern.length;i++){
 		var dot = pattern[i];
 		var c = pickColor(dot[0],dot[1],hctx);
@@ -72,32 +86,40 @@ function nextStep(){
 	}
 }
 
-setupChecker(60,5);
-nextStep();
+var logbox = document.getElementById("logger");
+function log(what){
+	logbox.innerHTML = logbox.innerHTML + "\n" + what;
+	logbox.scrollTop = logbox.scrollHeight;
+}
 
 function guess(event){
-	//todo
 	if (event.target.innerText == curNumber){
 		var res = getResult();
 		var pointForShader = res/360;
-		alert("Success! Your result is: "+res + "\nPoint for shader: "+pointForShader);
+		log("Success! Your result is: "+res + "\nPoint for shader: "+pointForShader);
+		nextColor();
+	}else{
+		log("Increasing color distance, loading next step.");
+		nextStep();
 	}
+}
+
+function nextColor(){
+	//debugger;
+	var state = advanceTest();
+	if (!state){
+		log("Test complete")
+		log(genShader())
+		return
+	}
+	log("Setting up checker for " + state.colorName +" shift...");
+	setupChecker(state.center,state.step);
 	nextStep();
 }
+nextColor();
+log("... Done.");
 
 </script>
 
-<br>
-<button type="button" onclick="guess(event)">1</button>
-<button type="button" onclick="guess(event)">2</button>
-<button type="button" onclick="guess(event)">3</button><br>
-<button type="button" onclick="guess(event)">4</button>
-<button type="button" onclick="guess(event)">5</button>
-<button type="button" onclick="guess(event)">6</button><br>
-<button type="button" onclick="guess(event)">7</button>
-<button type="button" onclick="guess(event)">8</button>
-<button type="button" onclick="guess(event)">9</button><br>
-<button type="button" onclick="guess(event)">0</button>
-<button type="button" onclick="guess(event)">Nothing/Unsure</button>
 </body>
 </html>
