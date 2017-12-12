@@ -68,6 +68,11 @@ function drawNumberBG(){
 	vctx.fillStyle = "#ffffff";
 }
 
+function choosePattern(){
+	//TODO check pattern != from previous one
+	return patterns[Math.floor(Math.random()*patterns.length)]
+}
+
 //var pattern = [[10,10,10]];
 function nextStep(){
 	changeNumber();
@@ -75,6 +80,7 @@ function nextStep(){
 	[bgcolor,fgcolor]=iterateColors();
 	bgcolor = toHex(bgcolor);
 	fgcolor = toHex(fgcolor);
+	pattern = choosePattern();
 	for (var i=0;i<pattern.length;i++){
 		var dot = pattern[i];
 		var c = pickColor(dot[0],dot[1],hctx);
