@@ -1,18 +1,3 @@
-function toHex([r,g,b]){
-	r|=0;
-	g|=0;
-	b|=0;
-	var toCoupleHex = function(x){
-		if (x.length <2){
-			x = "0"+x
-		}
-		return x
-	}
-	return "#"+
-		toCoupleHex(r.toString(16))+
-		toCoupleHex(g.toString(16))+
-		toCoupleHex(b.toString(16));
-}
 
 var colorChecker;
 function setupChecker(hue, step){

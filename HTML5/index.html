@@ -58,6 +58,18 @@ function drawDot(x, y, r, color, context){
 	context.fill();
 }
 
+function drawDotRandomizeL(x, y, r, color, variation, context){
+	context.beginPath();
+	context.arc(x, y, r, 0, 2 * Math.PI, false);
+	var hsl = rgb2hsl(hex2rgb(color));
+	console.log("Prima",hsl[0],hsl[1],hsl[2]);
+	hsl[2] = (hsl[2] + ((Math.random()*variation*2) - variation)) % 100;
+	console.log("Dopo",hsl[0],hsl[1],hsl[2]);
+	var randomizedColor = rgb2hex(hsl2rgb(hsl));
+	context.fillStyle = randomizedColor;
+	context.fill();
+}
+
 var canvas = document.getElementById("actualCanvas");
 var vctx = canvas.getContext("2d");
 function drawNumberBG(){
@@ -78,8 +90,8 @@ function nextStep(){
 	changeNumber();
 	drawNumberBG();
 	[bgcolor,fgcolor]=iterateColors();
-	bgcolor = toHex(bgcolor);
-	fgcolor = toHex(fgcolor);
+	bgcolor = rgb2hex(bgcolor);
+	fgcolor = rgb2hex(fgcolor);
 	pattern = choosePattern();
 	for (var i=0;i<pattern.length;i++){
 		var dot = pattern[i];
@@ -88,7 +100,8 @@ function nextStep(){
 		if (c[0] == 0) {
 			color = fgcolor;
 		}
-		drawDot(dot[0],dot[1],dot[2],color,vctx);
+		var randomization = 5;
+		drawDotRandomizeL(dot[0],dot[1],dot[2],color,randomization,vctx);
 	}
 }
 
