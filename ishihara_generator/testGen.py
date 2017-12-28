@@ -221,7 +221,10 @@ def checkYellow2():
 
 def main():
     # checkYellow()
-    checkColor(60.0,-5.0)
+    # checkColor(60.0, +5.0) #yellow
+    # checkColor(60.0, -5.0) #yellow
+    # checkColor(240.0, +5.0)
+    checkColor(300.0, -5.0)
 
 if __name__ == '__main__':
     main()
