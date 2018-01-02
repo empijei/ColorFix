@@ -37,7 +37,7 @@ function iterateColors(){
 		derivedhue %= 360;
 	}
 	if (derivedhue < 0){
-		derivedhue = 360 - derivedhue;
+		derivedhue = 360 + derivedhue;
 	}
 	derivedrgb = hsv2rgb([derivedhue,100,100]);
 	var lr = normalize(startrgb, derivedrgb);
