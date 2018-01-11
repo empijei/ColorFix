@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="pattern.js"></script>
+  <script src="hsupport.js"></script>
+  <script src="colorfix.js"></script>
+</head>
+<body>
+
+<div class="container">
+  <div class="row-sm-12">
+    <div class="col-sm-6">
+      <canvas id="hiddenCanvas" width="500" height="500"	style="display:none">
+  			Your browser does not support the canvas element.
+  		</canvas>
+
+  		<canvas id="actualCanvas" width="500" height="500" style="border:1px solid #d3d3d3;">
+  			Your browser does not support the canvas element.
+  		</canvas>
+
+
+    </div>
+    <div class="col-sm-6">
+      <textarea id="logger">Loading test, please wait...</textarea>
+      <br>
+      <button type="button" onclick="guess(event)">1</button>
+  		<button type="button" onclick="guess(event)">2</button>
+  		<button type="button" onclick="guess(event)">3</button><br>
+  		<button type="button" onclick="guess(event)">4</button>
+  		<button type="button" onclick="guess(event)">5</button>
+  		<button type="button" onclick="guess(event)">6</button><br>
+  		<button type="button" onclick="guess(event)">7</button>
+  		<button type="button" onclick="guess(event)">8</button>
+  		<button type="button" onclick="guess(event)">9</button><br>
+  		<button type="button" onclick="guess(event)">0</button>
+  		<button type="button" onclick="guess(event)">Nothing/Unsure</button>
+
+      </div>
+  </div>
+</div>
+<script>
+  /**/
+var canvas = document.getElementById("hiddenCanvas");
+var hctx = canvas.getContext("2d");
+var curNumber;
+function changeNumber(){
+hctx.rect(0, 0, 500, 500)
+hctx.fillStyle = "#000000";
+hctx.fill();
+hctx.fillStyle = "#ffffff";
+hctx.font = "500px Verdana";
+curNumber = Math.random()*10|0;
+hctx.fillText(curNumber,105,420);
+}
+
+function pickColor(x, y, context){
+data = context.getImageData(x, y, 1, 1).data;
+return [data[0], data[1], data[2]];
+}
+
+function drawDot(x, y, r, color, context){
+context.beginPath();
+context.arc(x, y, r, 0, 2 * Math.PI, false);
+context.fillStyle = color;
+context.fill();
+}
+
+function drawDotRandomizeL(x, y, r, color, variation, context){
+context.beginPath();
+context.arc(x, y, r, 0, 2 * Math.PI, false);
+var hsl = rgb2hsl(hex2rgb(color));
+console.log("Prima",hsl[0],hsl[1],hsl[2]);
+hsl[2] = (hsl[2] + ((Math.random()*variation*2) - variation)) % 100;
+console.log("Dopo",hsl[0],hsl[1],hsl[2]);
+var randomizedColor = rgb2hex(hsl2rgb(hsl));
+context.fillStyle = randomizedColor;
+context.fill();
+}
+
+var canvas = document.getElementById("actualCanvas");
+var vctx = canvas.getContext("2d");
+function drawNumberBG(){
+vctx.rect(0, 0, 500, 500)
+vctx.fillStyle = "#303030";
+vctx.fill();
+vctx.font = "500px Verdana";
+vctx.fillStyle = "#ffffff";
+}
+
+function choosePattern(){
+//TODO check pattern != from previous one
+return patterns[Math.floor(Math.random()*patterns.length)]
+}
+
+//var pattern = [[10,10,10]];
+function nextStep(){
+changeNumber();
+drawNumberBG();
+[bgcolor,fgcolor]=iterateColors();
+bgcolor = rgb2hex(bgcolor);
+fgcolor = rgb2hex(fgcolor);
+pattern = choosePattern();
+for (var i=0;i<pattern.length;i++){
+var dot = pattern[i];
+var c = pickColor(dot[0],dot[1],hctx);
+var color = bgcolor;
+if (c[0] == 0) {
+  color = fgcolor;
+}
+var randomization = 5;
+drawDotRandomizeL(dot[0],dot[1],dot[2],color,randomization,vctx);
+}
+}
+
+var logbox = document.getElementById("logger");
+function log(what){
+logbox.innerHTML = logbox.innerHTML + "\n" + what;
+logbox.scrollTop = logbox.scrollHeight;
+}
+
+function guess(event){
+if (event.target.innerText == curNumber){
+var res = getResult();
+var pointForShader = res/360;
+log("Success! Your result is: "+res + "\nPoint for shader: "+pointForShader);
+nextColor();
+}else{
+log("Increasing color distance, loading next step.");
+nextStep();
+}
+}
+
+function nextColor(){
+//debugger;
+var state = advanceTest();
+if (!state){
+log("Test complete")
+log(genShader())
+return
+}
+log("Setting up checker for " + state.colorName +" shift...");
+setupChecker(state.center,state.step);
+nextStep();
+}
+nextColor();
+log("... Done.");
+
+</script>
+</body>
+</html>
