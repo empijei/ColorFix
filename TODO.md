@@ -18,3 +18,6 @@ TODO:
   - Controllare se chrome supporta profili di colore custom (Deluminate)
   - Supportare altre piattaforme (android e windows in primis)
   - Attivare GitHub pages sul progetto, ed aggiungere eventuale script di build
+
+EXPERIMENTAL:
+  - Try implementing a more "soft" curve (spline?) for interpolating between points
