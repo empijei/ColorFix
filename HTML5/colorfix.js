@@ -89,6 +89,52 @@ function advanceTest(){
 
 function genShader(){
 	console.log(results);
+	var xs = [0,results.red.expected,results.green.expected,0.36,results.blue.expected,1];
+	var ys = [0,results.red.outcome,results.green.outcome,0.36,results.blue.outcome,1]
+	var ks = [];
+	CSPL.getNaturalKs(xs,ys,ks);
+	var conditions = "";
+	for(var i=100; i>=0;i--){
+		var y = everpolate.polynomial(i/100,xs,ys)[0];
+		console.log(y);
+		if (y>1){
+			y = 1;
+		}
+		if (y<0){
+			y = 0;
+		}
+		conditions += `
+		if (hsl.x < prev.x){
+ 					 cur=prev;
+ 					 prev=vec2(${i/100},${y});
+ 		  }
+		`;
+	}
+	console.log(conditions);
+	var splineShader = `vec3 correctFilter(vec3 hsl){
+		  //Hue
+		  vec2 prev, cur;
+		  prev=vec2(1.0,1.0);
+	 `
+	 splineShader += conditions;
+	 splineShader += `float coeff = (hsl.x - prev.x) / (cur.x - prev.x);
+		  hsl.x = (coeff*(cur.y-prev.y) + prev.y);
+
+		  //Saturation
+		  prev = vec2(0.0,0.0);
+		  cur = vec2(0.2,0.4);
+		  if (hsl.y > cur.x){
+					 prev=cur;
+					 cur=vec2(1.0,0.99);
+		  }
+
+		  coeff = (hsl.y - prev.x) / (cur.x - prev.x);
+		  hsl.y = (coeff*(cur.y-prev.y) + prev.y);
+
+		  return hsl;
+}
+`;
+	console.log(splineShader);
 	var shaderTmpl = `vec3 correctFilter(vec3 hsl){
 		  //Hue
 		  vec2 prev, cur;
@@ -137,5 +183,5 @@ function genShader(){
 		  return hsl;
 }
 `;
-	return shaderTmpl;
+	return splineShader;
 }
