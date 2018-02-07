@@ -90,12 +90,33 @@ function advanceTest(){
 function genShader(){
 	console.log(results);
 	var xs = [0,results.red.expected,results.green.expected,0.36,results.blue.expected,1];
-	var ys = [0,results.red.outcome,results.green.outcome,0.36,results.blue.outcome,1]
-	var ks = [];
-	CSPL.getNaturalKs(xs,ys,ks);
+	var ys = [0,results.red.outcome,results.green.outcome,0.36,results.blue.outcome,1];
 	var conditions = "";
+	///debug
+	var smoothed = {
+		x: [],
+		y: [],
+		type: 'scatter'
+	};
+	var original = {
+		x: xs,
+		y: ys,
+		type: 'scatter'
+	};
+	var precision = 10000
+	for(var i=precision; i>=0;i--){
+		var y = circleSmoothing(i/precision,xs,ys);
+		smoothed.x = smoothed.x.concat(i/precision);
+		smoothed.y = smoothed.y.concat(y);
+	}
+
+	var data = [smoothed,original];
+	Plotly.newPlot('plot', data);
+
+	///
+
 	for(var i=100; i>=0;i--){
-		var y = everpolate.polynomial(i/100,xs,ys)[0];
+		var y = circleSmoothing(i/100,xs,ys);
 		console.log(y);
 		if (y>1){
 			y = 1;

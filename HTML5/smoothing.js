@@ -1,12 +1,14 @@
-function circleSmoothing(x,xs,ys,k){
+function circleSmoothing(x,xs,ys){
 		var i = 1;
 		while(xs[i]<x) i++;
 		// x in [ xs[i-1], xs[i] ]
     //find y in the line connecting the previous and next points
-    var linearY = ((xs[i]-xs[i-1])/(ys[i]-ys[i-1]))*x
-
-    k = calculateMaxK(xs,ys);
-
+    var m = (ys[i]-ys[i-1])/(xs[i]-xs[i-1])
+    var q = ys[i]/(m*xs[i])
+    var linearY = m*x + q
+    console.log("linearY :="+linearY);
+    var k = calculateMaxK(xs,ys);
+    console.log("K :="+k);
     //detect if we are leaving a point, in the middle, or arriving to the next
     var prevDistance = calculateDistance(x,linearY,xs[i-1],ys[i-1]);
     var nextDistance = calculateDistance(x,linearY,xs[i],ys[i]);
@@ -41,6 +43,7 @@ function circleSmoothing(x,xs,ys,k){
     var Mab = (xs[i]-xs[i-1])/(ys[i]-ys[i-1])
     var Mbc = (xs[i+1]-xs[i])/(ys[i+1]-ys[i])
     var Mdf = -1/Mab
+    var Mef = -1/Mbc
     var Qdf = d[1]/(Mdf*d[0])
     var Qef = e[1]/(Mef*e[0])
     //using the as the second point the one with x == 0
