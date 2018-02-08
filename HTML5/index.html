@@ -4,6 +4,8 @@
 		<script src="pattern.js"></script>
 		<script src="hsupport.js"></script>
 		<script src="colorfix.js"></script>
+		<script src="smoothing.js"></script>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 	</head>
 	<body>
 		<canvas id="hiddenCanvas" width="500" height="500"
@@ -17,7 +19,7 @@
 		</canvas>
 
 		<textarea id="logger" rows="38" cols="100">Loading test, please wait...</textarea>
-
+		<div id="plot"><!-- Plotly chart will be drawn inside this DIV --></div>
 		<br>
 		<button type="button" onclick="guess(event)">1</button>
 		<button type="button" onclick="guess(event)">2</button>
