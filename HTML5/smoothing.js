@@ -1,33 +1,35 @@
 function circleSmoothing(x,xs,ys){
+		//TODO rethink about a max length for the curve....
+		//TODO insert switch for adjust precision, to make it more lightweight if necessary
 		var i = 1;
 		while(xs[i]<x) i++;
 		// x in [ xs[i-1], xs[i] ]
     //find y in the line connecting the previous and next points
     var m = (ys[i]-ys[i-1])/(xs[i]-xs[i-1])
-    var q = ys[i]/(m*xs[i])
+    var q = (xs[i]*ys[i-1] - xs[i-1]*ys[i])/(xs[i]-xs[i-1])
     var linearY = m*x + q
-    console.log("linearY :="+linearY);
     var k = calculateMaxK(xs,ys);
-    console.log("K :="+k);
+    // //console.log("K :="+k);
     //detect if we are leaving a point, in the middle, or arriving to the next
     var prevDistance = calculateDistance(x,linearY,xs[i-1],ys[i-1]);
     var nextDistance = calculateDistance(x,linearY,xs[i],ys[i]);
 
-
-
-    if(prevDistance>=k || nextDistance>=k){
+		//center part of the segment
+		if(prevDistance>=k && nextDistance>=k){
+			return linearY;
+		} else if(prevDistance<k && (i == 1)){ // leaving 0
       return linearY;
-    }
+    } else if(nextDistance<k && (i == xs.length-1)){ // arriving to 1
+			return linearY;
+		}
     if(prevDistance<k){
       //leaving a point
       //i becomes the center of the 3 points I am considering
       i -= 1;
     }
-    //manages first and last points
-    if(i<1 || i>=xs.length-1){
-      //maybe is going to work
-      return linearY;
-    }
+		//console.log("Current x : "+x)
+		//console.log("Current b : "+i)
+		//console.log("linearY :="+linearY);
     //a = point i-1
     //b = point i
     //c = point i+1
@@ -38,25 +40,59 @@ function circleSmoothing(x,xs,ys){
     //and then find the intersection of the perpendicular in a and c
     //which is going to be the center
     // f center
-    var d = getPointOnLine(xs[i],ys[i],xs[i-1],xs[i-1],k,-1);
-    var e = getPointOnLine(xs[i],ys[i],xs[i+1],xs[i+1],k,+1);
-    var Mab = (xs[i]-xs[i-1])/(ys[i]-ys[i-1])
-    var Mbc = (xs[i+1]-xs[i])/(ys[i+1]-ys[i])
+    var d = getPointOnLine(xs[i],ys[i],xs[i-1],ys[i-1],k,-1);
+    var e = getPointOnLine(xs[i],ys[i],xs[i+1],ys[i+1],k,+1);
+		//console.log("distance d "+calculateDistance(d[0],d[1],xs[i],ys[i]));
+		//console.log("distance e "+calculateDistance(e[0],e[1],xs[i],ys[i]));
+    var Mab = ( ys[i]   - ys[i-1] ) / ( xs[i]   - xs[i-1] )
+    var Mbc = ( ys[i+1] - ys[i]   ) / ( xs[i+1] - xs[i]   )
     var Mdf = -1/Mab
     var Mef = -1/Mbc
-    var Qdf = d[1]/(Mdf*d[0])
-    var Qef = e[1]/(Mef*e[0])
+    var Qdf = -Mdf*d[0] + d[1]
+    var Qef = -Mef*e[0] + e[1]
+		plotLine(Mdf,Qdf);
+		plotLine(Mef,Qef);
     //using the as the second point the one with x == 0
-    var f = line_intersect(d[0],d[1],0,Qdf,e[0],e[1],0,Qef);
+    var f = line_intersect(d[0],d[1],1,Mdf+Qdf,e[0],e[1],1,Mef+Qef);
     var radius = calculateDistance(f[0],f[1],d[0],d[1]);
-    var circlePart = 0;
-    if(prevDistance<k){
-      circlePart = e[1] - f[1];//e since we are leaving
+		var radius2 = calculateDistance(f[0],f[1],e[0],e[1]);
+		//console.log("Center to d "+radius+"; Center to e "+radius2);
+		//console.log("d "+d);
+		//console.log("e "+e);
+		//console.log("f "+f);
+		var debugd = line_intersect(d[0],d[1],f[0],f[1],xs[i-1],ys[i-1],xs[i],ys[i]);
+		var debuge = line_intersect(e[0],e[1],f[0],f[1],xs[i],ys[i],xs[i+1],ys[i+1]);
+		//console.log("Should be d "+debugd);
+		//console.log("Should be e "+debuge);
+
+		var circlePart = 0;
+    if(Mab< Mbc){
+      circlePart = -1;//e since we are leaving
     } else {
-      circlePart = d[1] - f[1];//d since we are arriving to b
+      circlePart = 1;//d since we are arriving to b
     }
     var circleY = getPointOnCircle(x,f,radius,circlePart)
     return circleY;
+}
+var plotted = []
+function plotLine(m,q){
+	for(i in plotted){
+		if(plotted[i].m == m && plotted[i].q == q){
+			return;
+		}
+	}
+	plotted = plotted.concat({m:m,q:q});
+	var precision = 1000;
+	var line = {
+		x: [],
+		y: [],
+		type: 'scatter'
+	};
+	for(var i = 0;i<=precision;i++){
+		line.x = line.x.concat(i/precision);
+		line.y = line.y.concat(m*(i/precision)+q);
+	}
+	Plotly.addTraces('plot', line);
 }
 
 function getPointOnCircle(x,center,radius,direction){
@@ -65,16 +101,45 @@ function getPointOnCircle(x,center,radius,direction){
   return y;
 }
 
-function line_intersect(x1, y1, x2, y2, x3, y3, x4, y4)
-{
-    var ua, ub, denom = (y4 - y3)*(x2 - x1) - (x4 - x3)*(y2 - y1);
-    if (denom == 0) {
-        return null;
+function line_intersect(line1StartX, line1StartY, line1EndX, line1EndY, line2StartX, line2StartY, line2EndX, line2EndY) {
+    // if the lines intersect, the result contains the x and y of the intersection (treating the lines as infinite) and booleans for whether line segment 1 or line segment 2 contain the point
+    var denominator, a, b, numerator1, numerator2, result = {
+        x: null,
+        y: null,
+        onLine1: false,
+        onLine2: false
+    };
+    denominator = ((line2EndY - line2StartY) * (line1EndX - line1StartX)) - ((line2EndX - line2StartX) * (line1EndY - line1StartY));
+    if (denominator == 0) {
+        return result;
     }
-    ua = ((x4 - x3)*(y1 - y3) - (y4 - y3)*(x1 - x3))/denom;
-    ub = ((x2 - x1)*(y1 - y3) - (y2 - y1)*(x1 - x3))/denom;
-    return [x1 + ua*(x2 - x1),y1 + ua*(y2 - y1)];
-}
+    a = line1StartY - line2StartY;
+    b = line1StartX - line2StartX;
+    numerator1 = ((line2EndX - line2StartX) * a) - ((line2EndY - line2StartY) * b);
+    numerator2 = ((line1EndX - line1StartX) * a) - ((line1EndY - line1StartY) * b);
+    a = numerator1 / denominator;
+    b = numerator2 / denominator;
+
+    // if we cast these lines infinitely in both directions, they intersect here:
+    result.x = line1StartX + (a * (line1EndX - line1StartX));
+    result.y = line1StartY + (a * (line1EndY - line1StartY));
+/*
+        // it is worth noting that this should be the same as:
+        x = line2StartX + (b * (line2EndX - line2StartX));
+        y = line2StartX + (b * (line2EndY - line2StartY));
+        */
+    // if line1 is a segment and line2 is infinite, they intersect if:
+    if (a > 0 && a < 1) {
+        result.onLine1 = true;
+    }
+    // if line2 is a segment and line1 is infinite, they intersect if:
+    if (b > 0 && b < 1) {
+        result.onLine2 = true;
+    }
+    // if line1 and line2 are segments, they intersect if both of the above are true
+    return [result.x,result.y];
+};
+
 
 //return the point in the direction selected, disting dist from x0,y0 on
 //the line between x0,y0 and x1,y1

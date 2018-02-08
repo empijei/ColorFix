@@ -88,7 +88,22 @@ function advanceTest(){
 }
 
 function genShader(){
-	console.log(results);
+	var layout = {
+		width: 800,
+		height: 800,
+		title: "fixed-ratio axes",
+		xaxis: {
+			nticks: 10,
+			domain: [0, 1],
+			title: "x"
+		},
+		yaxis: {
+			scaleanchor: "x",
+			domain: [0, 15],
+			title: "1:1"
+		}};
+
+	Plotly.newPlot('plot',[],layout);
 	var xs = [0,results.red.expected,results.green.expected,0.36,results.blue.expected,1];
 	var ys = [0,results.red.outcome,results.green.outcome,0.36,results.blue.outcome,1];
 	var conditions = "";
@@ -103,42 +118,55 @@ function genShader(){
 		y: ys,
 		type: 'scatter'
 	};
-	var precision = 10000
+	var precision = 1000
 	for(var i=precision; i>=0;i--){
 		var y = circleSmoothing(i/precision,xs,ys);
 		smoothed.x = smoothed.x.concat(i/precision);
 		smoothed.y = smoothed.y.concat(y);
-	}
-
-	var data = [smoothed,original];
-	Plotly.newPlot('plot', data);
-
-	///
-
-	for(var i=100; i>=0;i--){
-		var y = circleSmoothing(i/100,xs,ys);
-		console.log(y);
-		if (y>1){
-			y = 1;
-		}
-		if (y<0){
-			y = 0;
-		}
 		conditions += `
 		if (hsl.x < prev.x){
  					 cur=prev;
- 					 prev=vec2(${i/100},${y});
+ 					 prev=vec2(${i/precision},${y});
  		  }
 		`;
 	}
-	console.log(conditions);
+
+	var data = [smoothed,original];
+	Plotly.addTraces('plot', data);
+
 	var splineShader = `vec3 correctFilter(vec3 hsl){
 		  //Hue
 		  vec2 prev, cur;
 		  prev=vec2(1.0,1.0);
+			bool smooth = true;
+			/*ORIGINAL POINTS*/
+			if (!smooth){
+		 		if (hsl.x < prev.x){
+						 cur=prev;
+						 prev=vec2(${results.blue.expected},${results.blue.outcome});
+			  }
+			  if (hsl.x < prev.x){
+						 cur=prev;
+						 prev=vec2(0.36,0.36);
+			  }
+			  if (hsl.x < prev.x){
+						 cur=prev;
+						 prev=vec2(${results.green.expected},${results.green.outcome});
+			  }
+			  if (hsl.x < prev.x){
+						 cur=prev;
+						 prev=vec2(${results.red.expected},${results.red.outcome});
+			  }
+			  if (hsl.x < prev.x){
+						 cur=prev;
+						 prev=vec2(0.0,0.0);
+			  }
+			} else {
 	 `
 	 splineShader += conditions;
-	 splineShader += `float coeff = (hsl.x - prev.x) / (cur.x - prev.x);
+	 splineShader += `
+ 			}
+	 		float coeff = (hsl.x - prev.x) / (cur.x - prev.x);
 		  hsl.x = (coeff*(cur.y-prev.y) + prev.y);
 
 		  //Saturation
@@ -155,7 +183,6 @@ function genShader(){
 		  return hsl;
 }
 `;
-	console.log(splineShader);
 	var shaderTmpl = `vec3 correctFilter(vec3 hsl){
 		  //Hue
 		  vec2 prev, cur;
@@ -186,10 +213,6 @@ function genShader(){
 					 cur=prev;
 					 prev=vec2(0.0,0.0);
 		  }
-
-		  float coeff = (hsl.x - prev.x) / (cur.x - prev.x);
-		  hsl.x = (coeff*(cur.y-prev.y) + prev.y);
-
 		  //Saturation
 		  prev = vec2(0.0,0.0);
 		  cur = vec2(0.2,0.4);
