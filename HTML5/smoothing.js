@@ -1,6 +1,7 @@
 function circleSmoothing(x,xs,ys){
 		//TODO rethink about a max length for the curve....
 		//TODO insert switch for adjust precision, to make it more lightweight if necessary
+		//TODO implement binary search with the ifs instead of the current linear search
 		var i = 1;
 		while(xs[i]<x) i++;
 		// x in [ xs[i-1], xs[i] ]
