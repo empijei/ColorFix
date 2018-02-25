@@ -118,7 +118,7 @@ function genShader(){
 		y: ys,
 		type: 'scatter'
 	};
-	var precision = 1000
+	var precision = 100
 	for(var i=precision; i>=0;i--){
 		var y = circleSmoothing(i/precision,xs,ys);
 		smoothed.x = smoothed.x.concat(i/precision);
