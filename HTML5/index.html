@@ -18,23 +18,73 @@
 			Your browser does not support the canvas element.
 		</canvas>
 
-		<textarea id="logger" rows="38" cols="100">Loading test, please wait...</textarea>
+		<textarea id="logger" rows="5" cols="80">Loading test, please wait...</textarea>
 		<div id="plot"><!-- Plotly chart will be drawn inside this DIV --></div>
 		<br>
-		<button type="button" onclick="guess(event)">1</button>
-		<button type="button" onclick="guess(event)">2</button>
-		<button type="button" onclick="guess(event)">3</button><br>
-		<button type="button" onclick="guess(event)">4</button>
-		<button type="button" onclick="guess(event)">5</button>
-		<button type="button" onclick="guess(event)">6</button><br>
-		<button type="button" onclick="guess(event)">7</button>
-		<button type="button" onclick="guess(event)">8</button>
-		<button type="button" onclick="guess(event)">9</button><br>
-		<button type="button" onclick="guess(event)">0</button>
-		<button type="button" onclick="guess(event)">Nothing/Unsure</button>
+		<input type="text" id="number">
+		<button type="button" onclick="guess(event)">Answer</button><br>
+		<button type="button" onclick="typeNum(event)">1</button>
+		<button type="button" onclick="typeNum(event)">2</button>
+		<button type="button" onclick="typeNum(event)">3</button><br>
+		<button type="button" onclick="typeNum(event)">4</button>
+		<button type="button" onclick="typeNum(event)">5</button>
+		<button type="button" onclick="typeNum(event)">6</button><br>
+		<button type="button" onclick="typeNum(event)">7</button>
+		<button type="button" onclick="typeNum(event)">8</button>
+		<button type="button" onclick="typeNum(event)">9</button><br>
+		<button type="button" onclick="typeNum(event)">0</button>
+		<button type="button" onclick="typeNum(event)">Nothing/Unsure</button>
 
 		<script>
 			/**/
+
+			document.addEventListener('keydown', (event) => {
+			const keyName = event.key;
+			var num;
+			// alert(keyName);
+			switch(keyName) {
+			  case "1":
+			      num = 1;
+			      break;
+			  case "2":
+			      num = 2;
+			      break;
+			  case "3":
+			      num = 3;
+			      break;
+			  case "4":
+			      num = 4;
+			      break;
+			  case "5":
+			      num = 5;
+			      break;
+			  case "6":
+			      num = 6;
+			      break;
+			  case "7":
+			      num = 7;
+			      break;
+			  case "8":
+			      num = 8;
+			      break;
+			  case "9":
+			      num = 9;
+			      break;
+			  case "0":
+			      num = 0;
+			      break;
+				case "Enter":
+			      guess();
+						return;
+				case "Backspace":
+			      deleteChar();
+						return;
+			  default:
+			      return;
+			}
+			document.getElementById("number").value = document.getElementById("number").value + String(num);
+		}, false);
+
 var canvas = document.getElementById("hiddenCanvas");
 var hctx = canvas.getContext("2d");
 var curNumber;
@@ -46,6 +96,14 @@ function changeNumber(){
 	hctx.font = "500px Verdana";
 	curNumber = Math.random()*10|0;
 	hctx.fillText(curNumber,105,420);
+}
+
+function deleteChar(val){
+	if (document.getElementById("number").value.length>0 ){
+	document.getElementById("number").value = document.getElementById("number").value.slice(0,-1);
+}}
+function clearNum(val){
+		document.getElementById("number").value ="";
 }
 
 function pickColor(x, y, context){
@@ -113,16 +171,23 @@ function log(what){
 	logbox.scrollTop = logbox.scrollHeight;
 }
 
-function guess(event){
-	if (event.target.innerText == curNumber){
-		var res = getResult();
-		var pointForShader = res/360;
-		log("Success! Your result is: "+res + "\nPoint for shader: "+pointForShader);
-		nextColor();
-	}else{
-		log("Increasing color distance, loading next step.");
-		nextStep();
-	}
+function guess(){
+if (parseInt(document.getElementById("number").value) == curNumber){
+var res = getResult();
+var pointForShader = res/360;
+log("Success! Your result is: "+res + "\nPoint for shader: "+pointForShader);
+nextColor();
+}else{
+log("Increasing color distance, loading next step.");
+nextStep();
+}
+
+	clearNum();
+}
+
+function type(event){
+	document.getElementById("number").value = document.getElementById("number").value + event.innerHTML;
+
 }
 
 function nextColor(){

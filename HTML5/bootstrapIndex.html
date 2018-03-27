@@ -28,23 +28,26 @@
     <div class="col-sm-6">
       <textarea id="logger">Loading test, please wait...</textarea>
       <br>
-      <button type="button" onclick="guess(event)">1</button>
-  		<button type="button" onclick="guess(event)">2</button>
-  		<button type="button" onclick="guess(event)">3</button><br>
-  		<button type="button" onclick="guess(event)">4</button>
-  		<button type="button" onclick="guess(event)">5</button>
-  		<button type="button" onclick="guess(event)">6</button><br>
-  		<button type="button" onclick="guess(event)">7</button>
-  		<button type="button" onclick="guess(event)">8</button>
-  		<button type="button" onclick="guess(event)">9</button><br>
-  		<button type="button" onclick="guess(event)">0</button>
-  		<button type="button" onclick="guess(event)">Nothing/Unsure</button>
+      <input type="text" name="number">
+      <button type="button" onclick="guess(event)">Answer</button><br>
+      <button type="button" onclick="typeNum(event)">1</button>
+  		<button type="button" onclick="typeNum(event)">2</button>
+  		<button type="button" onclick="typeNum(event)">3</button><br>
+  		<button type="button" onclick="typeNum(event)">4</button>
+  		<button type="button" onclick="typeNum(event)">5</button>
+  		<button type="button" onclick="typeNum(event)">6</button><br>
+  		<button type="button" onclick="typeNum(event)">7</button>
+  		<button type="button" onclick="typeNum(event)">8</button>
+  		<button type="button" onclick="typeNum(event)">9</button><br>
+  		<button type="button" onclick="typeNum(event)">0</button>
+  		<button type="button" onclick="typeNum(event)">Nothing/Unsure</button>
 
       </div>
   </div>
 </div>
 <script>
   /**/
+
 var canvas = document.getElementById("hiddenCanvas");
 var hctx = canvas.getContext("2d");
 var curNumber;
@@ -123,8 +126,8 @@ logbox.innerHTML = logbox.innerHTML + "\n" + what;
 logbox.scrollTop = logbox.scrollHeight;
 }
 
-function guess(event){
-if (event.target.innerText == curNumber){
+function guess(){
+if (document.getElementById("number").innerText == curNumber){
 var res = getResult();
 var pointForShader = res/360;
 log("Success! Your result is: "+res + "\nPoint for shader: "+pointForShader);
@@ -133,6 +136,11 @@ nextColor();
 log("Increasing color distance, loading next step.");
 nextStep();
 }
+}
+
+function type(event){
+
+
 }
 
 function nextColor(){
