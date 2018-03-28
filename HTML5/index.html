@@ -248,7 +248,7 @@ function nextColor(){
 	var state = advanceTest();
 	if (!state){
 		log("Test complete")
-		log(genShader())
+		log(averageAndGenShader())
 		return
 	}
 	log("Setting up checker for " + state.colorName +" shift...");

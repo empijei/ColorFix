@@ -54,6 +54,7 @@ function getResult(){
 var ishiharaCursor = -1;
 var ishiharaDone = false;
 var statesCursor = -1;
+var iterationNumber = 0;
 var states = [
 	{
 		colorName: "red",
@@ -74,8 +75,11 @@ var states = [
 		step: 7
 	},
 ]
-
-var results = {};
+var iterations = 3;
+var results = [];
+for(var c = 0; c<iterations; c++){
+	results.push({});
+}
 var ishiharaResults = {};
 
 function nextIshiharaPlate(val){
@@ -120,7 +124,7 @@ function nextIshiharaPlate(val){
 		ishiharaDone = true;
 		//TODO do something meaningful with the results
 		switchToColorFix();
-		return parseResult();
+		return parseIshiharaResult();
 	}
 	showNextPlate()
 	return res;
@@ -143,17 +147,41 @@ function showNextPlate(){
 }
 
 function advanceTest(){
-		if (statesCursor >= 0 && statesCursor < states.length) {
-		results[states[statesCursor].colorName]={
+	if (statesCursor >= 0 && statesCursor < states.length) {
+		results[iterationNumber][states[statesCursor].colorName]={
 			outcome: getResult()/360,
 			expected: states[statesCursor].normal,
 		}
 	}
 	statesCursor++
+	if (statesCursor>=states.length && iterationNumber<iterations-1){
+		statesCursor = 0;
+		iterationNumber++;
+	}
 	return states[statesCursor];
 }
 
-function genShader(){
+function averageAndGenShader(){
+	var averageRes = {};
+	for(var i=0; i<states.length;i++){
+		averageRes[states[i].colorName]={
+			outcome: 0,
+			expected: states[i].normal
+		}
+	}
+	for(var i=0; i<results.length;i++){
+		var current = results[i]
+		for (var key in current){
+			averageRes[key].outcome = averageRes[key].outcome + current[key].outcome
+		}
+	}
+	for(var i=0; i<states.length;i++){
+		averageRes[states[i].colorName].outcome = averageRes[states[i].colorName].outcome/iterations;
+	}
+	return genShader(averageRes);
+}
+
+function genShader(results){
 	var layout = {
 		width: 800,
 		height: 800,
