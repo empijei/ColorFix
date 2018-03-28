@@ -51,7 +51,8 @@ function getResult(){
 		return colorChecker.iteration*colorChecker.step+colorChecker.hue;
 	}
 }
-
+var ishiharaCursor = -1;
+var ishiharaDone = false;
 var statesCursor = -1;
 var states = [
 	{
@@ -75,9 +76,74 @@ var states = [
 ]
 
 var results = {};
+var ishiharaResults = {};
+
+function nextIshiharaPlate(val){
+	var res = "unknown";
+	if (ishiharaCursor >= 0) {
+		var plate = ishiharaPlates[ishiharaCursor];
+		if (!plate.redGreenSpecific){
+			switch (val){
+				case plate.value:
+					res = "correct";
+					break;
+				case plate.redGreen:
+					res = "redgreen";
+					break;
+				default:
+					res = "colorblind"
+			}
+		} else {
+			switch (val){
+				case plate.value:
+					res = "correct";
+					break;
+				case plate.protan:
+					res = "protan"
+					break
+				case plate.deutan:
+					res = "deutan"
+					break;
+				default:
+					res = "colorblind"
+			}
+		}
+	}
+	else {
+		ishiharaCursor++
+		showNextPlate()
+		return;
+	}
+	ishiharaResults[ishiharaCursor] = res;
+	ishiharaCursor++
+	if (ishiharaCursor >= ishiharaPlates.length){
+		ishiharaDone = true;
+		//TODO do something meaningful with the results
+		switchToColorFix();
+		return parseResult();
+	}
+	showNextPlate()
+	return res;
+}
+
+function switchToColorFix(){
+	document.getElementById("ishiharaTest").style = "display:none;";
+	document.getElementById("colorFixTest").style = "";
+	nextColor();
+	log("... Done.");
+
+}
+
+function parseIshiharaResult(){
+	return "TODO parseIshiharaResult";
+}
+function showNextPlate(){
+	var img = document.getElementById("ishiharaPlate");
+	img.src = "images/"+ ishiharaPlates[ishiharaCursor].name
+}
 
 function advanceTest(){
-	if (statesCursor >= 0 && statesCursor < states.length) {
+		if (statesCursor >= 0 && statesCursor < states.length) {
 		results[states[statesCursor].colorName]={
 			outcome: getResult()/360,
 			expected: states[statesCursor].normal,

@@ -5,36 +5,56 @@
 		<script src="hsupport.js"></script>
 		<script src="colorfix.js"></script>
 		<script src="smoothing.js"></script>
+		<script src="ishihara.js"></script>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 	</head>
 	<body>
-		<canvas id="hiddenCanvas" width="500" height="500"
-			style="display:none">
-			Your browser does not support the canvas element.
-		</canvas>
 
-		<canvas id="actualCanvas" width="500" height="500"
-			style="border:1px solid #d3d3d3;">
-			Your browser does not support the canvas element.
-		</canvas>
+		<div id="ishiharaTest">
 
-		<textarea id="logger" rows="5" cols="80">Loading test, please wait...</textarea>
+			<img src="images/plate-08.png" width="500" height="500" alt="Ishihara test plate" id="ishiharaPlate">
+			<input type="text" id="numberIshihara">
+			<button type="button" onclick="guessIshihara(event)">Answer</button><br>
+			<button type="button" onclick="typeNumIshihara(event)">1</button>
+			<button type="button" onclick="typeNumIshihara(event)">2</button>
+			<button type="button" onclick="typeNumIshihara(event)">3</button><br>
+			<button type="button" onclick="typeNumIshihara(event)">4</button>
+			<button type="button" onclick="typeNumIshihara(event)">5</button>
+			<button type="button" onclick="typeNumIshihara(event)">6</button><br>
+			<button type="button" onclick="typeNumIshihara(event)">7</button>
+			<button type="button" onclick="typeNumIshihara(event)">8</button>
+			<button type="button" onclick="typeNumIshihara(event)">9</button><br>
+			<button type="button" onclick="typeNumIshihara(event)">0</button>
+			<button type="button" onclick="typeNumIshihara(event)">Nothing/Unsure</button>
+
+		</div>
+		<div id="colorFixTest" style="display:none">
+			<canvas id="hiddenCanvas" width="500" height="500"
+				style="display:none">
+				Your browser does not support the canvas element.
+			</canvas>
+
+			<canvas id="actualCanvas" width="500" height="500"
+				style="border:1px solid #d3d3d3;">
+				Your browser does not support the canvas element.
+			</canvas>
+			<br>
+			<input type="text" id="number">
+			<button type="button" onclick="guess(event)">Answer</button><br>
+			<button type="button" onclick="typeNum(event)">1</button>
+			<button type="button" onclick="typeNum(event)">2</button>
+			<button type="button" onclick="typeNum(event)">3</button><br>
+			<button type="button" onclick="typeNum(event)">4</button>
+			<button type="button" onclick="typeNum(event)">5</button>
+			<button type="button" onclick="typeNum(event)">6</button><br>
+			<button type="button" onclick="typeNum(event)">7</button>
+			<button type="button" onclick="typeNum(event)">8</button>
+			<button type="button" onclick="typeNum(event)">9</button><br>
+			<button type="button" onclick="typeNum(event)">0</button>
+			<button type="button" onclick="typeNum(event)">Nothing/Unsure</button>
+		</div>
+		<textarea id="logger" cols="100">Loading test, please wait...</textarea>
 		<div id="plot"><!-- Plotly chart will be drawn inside this DIV --></div>
-		<br>
-		<input type="text" id="number">
-		<button type="button" onclick="guess(event)">Answer</button><br>
-		<button type="button" onclick="typeNum(event)">1</button>
-		<button type="button" onclick="typeNum(event)">2</button>
-		<button type="button" onclick="typeNum(event)">3</button><br>
-		<button type="button" onclick="typeNum(event)">4</button>
-		<button type="button" onclick="typeNum(event)">5</button>
-		<button type="button" onclick="typeNum(event)">6</button><br>
-		<button type="button" onclick="typeNum(event)">7</button>
-		<button type="button" onclick="typeNum(event)">8</button>
-		<button type="button" onclick="typeNum(event)">9</button><br>
-		<button type="button" onclick="typeNum(event)">0</button>
-		<button type="button" onclick="typeNum(event)">Nothing/Unsure</button>
-
 		<script>
 			/**/
 
@@ -74,7 +94,7 @@
 			      num = 0;
 			      break;
 				case "Enter":
-			      guess();
+			      enter();
 						return;
 				case "Backspace":
 			      deleteChar();
@@ -82,7 +102,7 @@
 			  default:
 			      return;
 			}
-			document.getElementById("number").value = document.getElementById("number").value + String(num);
+			addChar(num);
 		}, false);
 
 var canvas = document.getElementById("hiddenCanvas");
@@ -98,12 +118,28 @@ function changeNumber(){
 	hctx.fillText(curNumber,105,420);
 }
 
-function deleteChar(val){
-	if (document.getElementById("number").value.length>0 ){
-	document.getElementById("number").value = document.getElementById("number").value.slice(0,-1);
+function deleteChar(){
+	var id = "number";
+	if (ishiharaDone == false){
+		var id = "numberIshihara";
+	}
+	if (document.getElementById(id).value.length>0 ){
+	document.getElementById(id).value = document.getElementById(id).value.slice(0,-1);
 }}
+
+function addChar(val){
+	var id = "number";
+	if (ishiharaDone == false){
+		var id = "numberIshihara";
+	}
+	document.getElementById(id).value = document.getElementById(id).value + String(val);
+}
 function clearNum(val){
-		document.getElementById("number").value ="";
+		var id = "number";
+		if (ishiharaDone == false){
+			var id = "numberIshihara";
+		}
+		document.getElementById(id).value ="";
 }
 
 function pickColor(x, y, context){
@@ -122,9 +158,9 @@ function drawDotRandomizeL(x, y, r, color, variation, context){
 	context.beginPath();
 	context.arc(x, y, r, 0, 2 * Math.PI, false);
 	var hsl = rgb2hsl(hex2rgb(color));
-	console.log("Prima",hsl[0],hsl[1],hsl[2]);
+	// console.log("Prima",hsl[0],hsl[1],hsl[2]);
 	hsl[2] = (hsl[2] + ((Math.random()*variation*2) - variation)) % 100;
-	console.log("Dopo",hsl[0],hsl[1],hsl[2]);
+	// console.log("Dopo",hsl[0],hsl[1],hsl[2]);
 	var randomizedColor = rgb2hex(hsl2rgb(hsl));
 	context.fillStyle = randomizedColor;
 	context.fill();
@@ -171,23 +207,40 @@ function log(what){
 	logbox.scrollTop = logbox.scrollHeight;
 }
 
-function guess(){
-if (parseInt(document.getElementById("number").value) == curNumber){
-var res = getResult();
-var pointForShader = res/360;
-log("Success! Your result is: "+res + "\nPoint for shader: "+pointForShader);
-nextColor();
-}else{
-log("Increasing color distance, loading next step.");
-nextStep();
-}
 
+function guessIshihara(){
+	var res = nextIshiharaPlate(document.getElementById("numberIshihara").value);
+	log(res);
 	clearNum();
 }
 
-function type(event){
-	document.getElementById("number").value = document.getElementById("number").value + event.innerHTML;
+function typeNumIshihara(event){
+	document.getElementById("numberIshihara").value = document.getElementById("numberIshihara").value + event.innerHTML;
+}
+function enter(){
+	if (ishiharaDone == true){
+		guess()
+	}
+	else{
+		guessIshihara()
+	}
+}
 
+function guess(){
+	if (parseInt(document.getElementById("number").value) == curNumber){
+		var res = getResult();
+		var pointForShader = res/360;
+		log("Success! Your result is: "+res + "\nPoint for shader: "+pointForShader);
+		nextColor();
+	}else{
+		log("Increasing color distance, loading next step.");
+		nextStep();
+	}
+	clearNum();
+}
+
+function typeNum(event){
+	document.getElementById("number").value = document.getElementById("number").value + event.innerHTML;
 }
 
 function nextColor(){
@@ -202,9 +255,7 @@ function nextColor(){
 	setupChecker(state.center,state.step);
 	nextStep();
 }
-nextColor();
-log("... Done.");
-
+nextIshiharaPlate()
 </script>
 
 </body>

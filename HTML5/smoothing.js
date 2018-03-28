@@ -51,8 +51,8 @@ function circleSmoothing(x,xs,ys){
     var Mef = -1/Mbc
     var Qdf = -Mdf*d[0] + d[1]
     var Qef = -Mef*e[0] + e[1]
-		plotLine(Mdf,Qdf);
-		plotLine(Mef,Qef);
+		//plotLine(Mdf,Qdf);
+		//plotLine(Mef,Qef);
     //using the as the second point the one with x == 0
     var f = line_intersect(d[0],d[1],1,Mdf+Qdf,e[0],e[1],1,Mef+Qef);
     var radius = calculateDistance(f[0],f[1],d[0],d[1]);
