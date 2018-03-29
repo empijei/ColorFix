@@ -210,7 +210,11 @@ function log(what){
 
 function guessIshihara(){
 	var res = nextIshiharaPlate(document.getElementById("numberIshihara").value);
-	log(res);
+	if (ishiharaDone){
+		log("Final Ishihara Test results : "+res)
+	} else {
+		log("partial result :"+res);
+	}
 	clearNum();
 }
 
