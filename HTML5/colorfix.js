@@ -137,9 +137,32 @@ function switchToColorFix(){
 	log("... Done.");
 
 }
-
+/*
+Can return :
+	-	normal
+	- colorblind : some color vision difect has been detected, but either it is not redgreen  or we were not able to identify it
+	- redgreen : generic red-green color-blindness detected, maybe mild or a mashup of deutan and protan
+	- deutan : deuteranomaly detected, probably at least moderate
+	- protan : protanomaly detected, probably at least moderate
+*/
 function parseIshiharaResult(){
-	return "TODO parseIshiharaResult";
+	if (ishiharaResults.includes("redgreen")){
+		if (ishiharaResults.includes("deutan") && !ishiharaResults.includes("protan")){
+			return "deutan"
+		} else {
+			if (ishiharaResults.includes("protan") && !ishiharaResults.includes("deutan")){
+				return "protan"
+			} else {
+				return "redgreen"
+			}
+		}
+	} else {
+		if (ishiharaResults.includes("colorblind")){
+			return "colorblind";
+		} else {
+			return "normal";
+		}
+	}
 }
 function showNextPlate(){
 	var img = document.getElementById("ishiharaPlate");
