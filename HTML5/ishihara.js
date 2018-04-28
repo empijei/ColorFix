@@ -92,14 +92,14 @@ var ishiharaPlates = [
   },
   {
     name : "plate-21.png",
-    value : "x",
+    value : "",
     redGreen : "5",
     colorblind : "x",
     redGreenSpecific : false
   },
   {
     name : "plate-22.png",
-    value : "x",
+    value : "",
     redGreen : "45",
     colorblind : "x",
     redGreenSpecific : false

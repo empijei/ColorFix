@@ -48,9 +48,10 @@ function iterateColors(){
 
 function getResult(){
 	if (colorChecker){
-		return colorChecker.iteration*colorChecker.step+colorChecker.hue;
+		return (colorChecker.iteration - 1) * colorChecker.step + colorChecker.hue;
 	}
 }
+
 var ishiharaCursor = -1;
 var ishiharaDone = false;
 var statesCursor = -1;
@@ -221,8 +222,8 @@ function genShader(results){
 		}};
 
 	Plotly.newPlot('plot',[],layout);
-	var xs = [0,results.red.expected,results.green.expected,0.36,results.blue.expected,1];
-	var ys = [0,results.red.outcome,results.green.outcome,0.36,results.blue.outcome,1];
+	var xs = [0,results.red.expected,results.green.expected,0.33,results.blue.expected,1];
+	var ys = [0,results.red.outcome,results.green.outcome,0.33,results.blue.outcome,1];
 	var conditions = "";
 	///debug
 	var smoothed = {
@@ -264,7 +265,7 @@ function genShader(results){
 			  }
 			  if (hsl.x < prev.x){
 						 cur=prev;
-						 prev=vec2(0.36,0.36);
+						 prev=vec2(0.33,0.33);
 			  }
 			  if (hsl.x < prev.x){
 						 cur=prev;
@@ -316,7 +317,7 @@ function genShader(results){
 		  }
 		  if (hsl.x < prev.x){
 					 cur=prev;
-					 prev=vec2(0.36,0.36);
+					 prev=vec2(0.33,0.33);
 		  }
 		  if (hsl.x < prev.x){
 					 cur=prev;
