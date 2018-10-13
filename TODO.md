@@ -4,6 +4,7 @@ TODO:
   - Sistemare soglia rosso negativa spezzando il segmento nell'origine
   - Aggiustare test viola
   - Sistemare luminosità random
+  - Fix this? https://codepen.io/empijei/pen/oaeOrq
   - ~~Più iterazioni sul test con medie~~
   - Bin search per le soglie
   - Varie possibili variazioni (quanto fedeli tenere i colori)
